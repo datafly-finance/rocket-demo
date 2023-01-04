@@ -1,0 +1,20 @@
+{
+  "name": "rocket-demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "Regan",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^18.11.18",
+    "axios": "^1.2.2",
+    "dayjs": "^1.11.7",
+    "eventsource": "^2.0.2",
+    "rxjs": "^7.8.0"
+  },
+  "devDependencies": {
+    "@types/eventsource": "^1.1.10"
+  }
+}
