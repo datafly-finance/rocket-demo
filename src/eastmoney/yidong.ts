@@ -1,7 +1,8 @@
 import axios from 'axios'
+import dayjs from 'dayjs';
 import { Subject, filter, interval } from 'rxjs';
 
-const url = ( codes: string[] ) => `http://push2.eastmoney.com/api/qt/pkyd/get?&fields=f1,f2,f4,f5,f6,f7&secids=${ codes.join( "," ) }&lmt=2&ut=fa5fd1943c7b386f172d6893dbfba10b`
+const url = ( codes: string[] ) => `http://push2.eastmoney.com/api/qt/pkyd/get?&fields=f1,f2,f4,f5,f6,f7&secids=${ codes.join( "," ) }&lmt=10&ut=fa5fd1943c7b386f172d6893dbfba10b`
 
 declare module Input
 {
@@ -41,18 +42,19 @@ export const yidongData = ( codes: string[] ) =>
     let lastTime = "";
     const subject = new Subject<string[]>();
     interval( 5000 ).pipe(
-        // filter( () =>
-        // {
-        //     const now = dayjs().format( "HH:mm:ss" );
-        //     console.log("当前时间",now)
-        //     if ( dayjs().day() < 1 || dayjs().day() > 5 ) return false;
-        //     if ( now >= "09:30:00" && now <= "11:30:00" || now >= "13:00:00" && now <= "15:00:00" )
-        //     {
-        //         return true;
-        //     }
-        //     console.log("不在交易时间")
-        //     return false
-        // } )
+        filter( () =>
+        {
+            const now = dayjs().format( "HH:mm:ss" );
+            console.log("当前时间",now)
+            if ( dayjs().day() < 1 || dayjs().day() > 5 ) return false;
+            if ( now >= "09:30:00" && now <= "11:30:00" || now >= "13:00:00" && now <= "15:00:00" )
+            {
+                return true;
+            }
+            console.log("不在交易时间!")
+            if (now >= "15:00:00" && lastTime != '') { lastTime = "";}
+            return false
+        } )
     ).subscribe(
         async () =>
         {
