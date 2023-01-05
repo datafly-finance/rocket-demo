@@ -2,6 +2,6 @@ lib
 node_modules
 build
 
-
+tsconfig.tsbuildinfo
 **/*.bs.js
 **/*.gen.tsx
