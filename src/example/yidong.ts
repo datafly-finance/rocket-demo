@@ -11,6 +11,7 @@ states.set( "503", "加速下跌" )
 states.set( "403", "快速反弹" )
 states.set( "402", "火箭发射" )
 states.set("201", "封涨停板")
+states.set("202","打开涨停板")
 
 const msg = ( it: string[] ) =>
 {
