@@ -4,20 +4,21 @@ import { Tick } from '../helper/tick'
 import { hotStock } from '../tonghuashun/hotStock'
 import { Subject, interval } from 'rxjs'
 import { SendTextMsg, bot1 } from '../utils/wxMsg'
+import { Log } from '../utils/log'
 
 const LIMIT = 35;
 
 const HotStock = async () =>
 {
     let stocks = await hotStock()
-    console.log(stocks)
     const subject = new Subject<string[]>()
 
-    Tick( 30 * 60 * 1000 ).subscribe( () =>
+    Tick( 10 * 60 * 1000 ).subscribe( () =>
     {
         hotStock().then( data =>
         {
             stocks = data
+            Log("更新热门股票:",data.slice( 0, LIMIT ).map( it => it[ 1 ] ))
             subject.next( data.slice( 0, LIMIT ).map( it => it[ 1 ] ) )
         } )
     } )
@@ -25,7 +26,6 @@ const HotStock = async () =>
         send: ( msg: string, code: string ) =>
         {
             const stock = stocks.find( it => it[ 1 ] === code )
-            console.log("code is :",code)
             if ( stock )
             {
                 SendTextMsg(
@@ -33,16 +33,11 @@ const HotStock = async () =>
                     ${ stock[ 3 ] ?? '' }
                 `, bot1
                 )
-                // console.log( ` -----
-                //     ${ msg }
-                //     ${ stock[ 3 ] ?? '' }
-                // `)
+                return
             }
-            // return msg
-            // console.log( msg, "-------" )
             SendTextMsg( msg, bot1 )
         },
-        stocks: () => stocks.slice(0, LIMIT),
+        stocks: () => stocks.slice( 0, LIMIT ),
         stockChannel: subject
     }
 
@@ -53,21 +48,27 @@ const TickDemo = async ( send: ( msg: string, code: string ) => void ) =>
     const map = new Map<string, YiDongType[]>()
 
     interval( 3 * 60 * 60 * 1000 ).subscribe(
-        dayjs().format( 'HH:mm:ss' ) >= "15:00:00" ? () => map.clear() : () => { }
+        dayjs().format( 'HH:mm:ss' ) >= "15:00:00" ? () =>
+        {
+            map.clear()
+            Log( "清空map------------", [ ...map.keys() ].length === 0 )
+        } : () => { }
     )
 
     Tick( 5 * 1000 ).subscribe( () =>
     {
 
-        console.log( "开始更新" )
+        Log( "开始更新" )
         let stocks = [ ...map.keys() ].map( code => code.startsWith( "6" ) ? `1.${ code }` : `0.${ code }` )
-        console.log( "stocks", stocks )
-        if ( stocks.length === 0 ){
-            console.log( "stocks.length === 0" )
+        if ( stocks.length === 0 )
+        {
+            Log( "stocks.length === 0" )
             return
         }
+        console.log("stocks 更新:",stocks)
         yidong( stocks ).then( data =>
         {
+            Log( " 异动信息：", data )
             data.forEach( it =>
             {
                 const [ time, code, name, state, info, isGood ] = it;
@@ -98,19 +99,17 @@ const TickDemo = async ( send: ( msg: string, code: string ) => void ) =>
                         )
                     } else
                     {
-                        console.log( "过滤掉20秒前的数据", dayjs().subtract( 20, 's' ).format( 'HH:mm:ss' ), time )
-                        console.log(
+                        Log(
                             `${ name } ${ time } ${ states.get( state ) ?? "未知" } ${ info } [${ isGood === '1' ? "Good" : "Bad" }]`,
                             code
                         )
                     }
                 }
             } )
-        } ).catch( err => console.log( err ) )
+        } ).catch( err => Log( err ) )
     } )
     return ( codes: string[] ) =>
     {
-        console.log("get codes", codes);
         codes.forEach( it =>
         {
             const stock = map.get( it )
@@ -125,10 +124,10 @@ const TickDemo = async ( send: ( msg: string, code: string ) => void ) =>
 
 const start = async () =>
 {
-    const { send, stockChannel,stocks } = await HotStock()
+    const { send, stockChannel, stocks } = await HotStock()
     const updateStock = await TickDemo( send )
     // init 
-    updateStock( stocks().map( it => it[ 1 ] ))
+    updateStock( stocks().map( it => it[ 1 ] ) )
     // update
     stockChannel.subscribe( updateStock )
 }

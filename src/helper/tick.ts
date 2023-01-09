@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import { filter, interval } from "rxjs";
+import { Log } from "../utils/log";
 
 export const Tick = (ticker:number)=>
     interval(ticker).pipe(
@@ -9,7 +10,7 @@ export const Tick = (ticker:number)=>
             if (now >= "09:25:00" && now <= "11:30:00" || now >= "13:00:00" && now <= "15:00:00") {
                 return true;
             }
-            console.log("不在交易时间!")
+            Log("不在交易时间!")
             return false;
         })
     )

@@ -1,8 +1,9 @@
 import axios from 'axios'
 import dayjs from 'dayjs';
 import { Subject, filter, interval } from 'rxjs';
+import { Log } from '../utils/log';
 
-const url = ( codes: string[] ) => `http://push2.eastmoney.com/api/qt/pkyd/get?&fields=f1,f2,f4,f5,f6,f7&secids=${ codes.join( "," ) }&lmt=100&ut=fa5fd1943c7b386f172d6893dbfba10b`
+const url = ( codes: string[] ) => `http://push2.eastmoney.com/api/qt/pkyd/get?&fields=f1,f2,f4,f5,f6,f7&secids=${ codes.join( "," ) }&lmt=500&ut=fa5fd1943c7b386f172d6893dbfba10b`
 
 export const states = new Map<string, string>()
 states.set( "2", "大笔买入" )
@@ -72,13 +73,12 @@ export const yidongData = ( codes: string[] ) =>
         filter( () =>
         {
             const now = dayjs().format( "HH:mm:ss" );
-            console.log("当前时间",now)
             if ( dayjs().day() < 1 || dayjs().day() > 5 ) return false;
             if ( now >= "09:25:00" && now <= "11:30:00" || now >= "13:00:00" && now <= "15:00:00" )
             {
                 return true;
             }
-            console.log("不在交易时间!")
+            Log("不在交易时间!")
             if (now >= "15:00:00" && lastTime != '') { lastTime = "";}
             return false
         } )
@@ -92,16 +92,16 @@ export const yidongData = ( codes: string[] ) =>
                 {
                     lastTime = it[ 0 ];
                     subject.next( it );
-                    console.log("第一次",it)
+                    Log("第一次",it)
                 } else
                 {
                     if ( it[ 0 ] > lastTime )
                     {
                         lastTime = it[ 0 ];
                         subject.next( it );
-                        console.log("更新",it)
+                        Log("更新",it)
                     }else{
-                        console.log("不更新",it)
+                       Log("不更新",it)
                     }
                 }
             } )
