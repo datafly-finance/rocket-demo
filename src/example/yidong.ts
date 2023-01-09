@@ -1,6 +1,6 @@
 import { yidongData, codes, states } from '../eastmoney/yidong';
 import { Log } from '../utils/log';
-import { SendTextMsg } from '../utils/wxMsg';
+import { SendNewsMsg } from '../utils/wxMsg';
 
 
 const msg = ( it: string[] ) =>
@@ -17,5 +17,7 @@ const msg = ( it: string[] ) =>
 
 yidongData( codes ).subscribe( it => {
     Log(msg(it))
-    SendTextMsg(msg(it))
+    // SendTextMsg(msg(it))
+    // SendMDMsg(FormatMDMsg(it))
+    SendNewsMsg(it)
 })

@@ -18,7 +18,7 @@ const HotStock = async () =>
         hotStock().then( data =>
         {
             stocks = data
-            Log("更新热门股票:",data.slice( 0, LIMIT ).map( it => it[ 1 ] ))
+            Log( "更新热门股票:", data.slice( 0, LIMIT ).map( it => it[ 1 ] ) )
             subject.next( data.slice( 0, LIMIT ).map( it => it[ 1 ] ) )
         } )
     } )
@@ -48,11 +48,14 @@ const TickDemo = async ( send: ( msg: string, code: string ) => void ) =>
     const map = new Map<string, YiDongType[]>()
 
     interval( 3 * 60 * 60 * 1000 ).subscribe(
-        dayjs().format( 'HH:mm:ss' ) >= "15:00:00" ? () =>
+        () =>
         {
-            map.clear()
-            Log( "清空map------------", [ ...map.keys() ].length === 0 )
-        } : () => { }
+            if ( dayjs().format( 'HH:mm:ss' ) >= "15:00:00" )
+            {
+                map.clear()
+                Log( "清空map------------", [ ...map.keys() ].length === 0 )
+            }
+        }
     )
 
     Tick( 5 * 1000 ).subscribe( () =>
@@ -62,10 +65,9 @@ const TickDemo = async ( send: ( msg: string, code: string ) => void ) =>
         let stocks = [ ...map.keys() ].map( code => code.startsWith( "6" ) ? `1.${ code }` : `0.${ code }` )
         if ( stocks.length === 0 )
         {
-            Log( "stocks.length === 0" )
+            Log( "没有股票" )
             return
         }
-        console.log("stocks 更新:",stocks)
         yidong( stocks ).then( data =>
         {
             Log( " 异动信息：", data )
