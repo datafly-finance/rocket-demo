@@ -9,6 +9,7 @@ import { AllDataWithFilter, YiDongType, } from "../eastmoney/yidong";
 import { hotStock } from "../tonghuashun/hotStock";
 import dayjs from "dayjs";
 import { Log } from "../utils/log";
+import { SendMDMsg, SendNewsMsg, bot1 } from "../utils/wxMsg";
 
 
 const isHotFac = () =>
@@ -73,4 +74,4 @@ const HotNews = () => AllDataWithFilter( [
     isDown
 ] )
 
-HotNews().subscribe(Log)
+HotNews().subscribe(data=>SendNewsMsg(data,bot1))

@@ -55,7 +55,7 @@ export const SendNewsMsg = ( msg: YiDongType, bot:string = "https://qyapi.weixin
                     "title": `${name} ${ time }  [${ isGood === '1' ? "Good" : "Bad" }]`,
                     "description": `${ type } ${ info1 }`,
                     "url": `https://wap.eastmoney.com/quote/stock/${ CodeWithType(code) }.html`,
-                    "picurl": `http://webquotepic.eastmoney.com/GetPic.aspx?nid=${CodeWithType(code)}&imageType=r`
+                    "picurl": `http://webquotepic.eastmoney.com/GetPic.aspx?nid=${CodeWithType(code)}&imageType=r&_t=${Date.now()}`
                 }
             ]
         }

@@ -71,9 +71,28 @@ export type YiDongType = [
 ]
 
 export const yidongData = ( codes: string[] ) =>
-    AllDataWithFilter( [
-        it => codes.includes( it[ 1 ] )
-    ] )
+{
+    let lastTime = "";
+    const subject = new Subject<YiDongType>();
+    Tick(5 * 1000, !!process.env.DEV).subscribe(
+        async () =>
+        {
+            const data = await yidong( codes );
+            data.forEach( it =>
+            {
+                if ( it[ 0 ] > lastTime )
+                {
+                    lastTime = it[ 0 ];
+                    subject.next( it );
+                    Log("更新",it)
+                }else{
+                   Log("不更新",it)
+                }
+            } )
+        }
+    )
+    return subject;
+} 
 
 
 
